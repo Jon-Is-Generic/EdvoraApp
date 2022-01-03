@@ -7,10 +7,11 @@ from fastapi_users.authentication import (
     BearerTransport,
     JWTStrategy,
 )
+from fastapi_users.authentication.strategy import AccessTokenDatabase, DatabaseStrategy
 from fastapi_users.db import SQLAlchemyUserDatabase
 
-from app.db import get_user_db
-from app.models import User, UserCreate, UserDB, UserUpdate
+from app.db import get_user_db, get_access_token_db
+from app.models import User, UserCreate, UserDB, UserUpdate, AccessToken
 
 SECRET = "SECRET"
 
@@ -38,17 +39,19 @@ async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db
     yield UserManager(user_db)
 
 
-bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
+bearer_transport = BearerTransport(tokenUrl="auth/db/login") # TODO - swap to db properly
 
 
-def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
 
+def get_database_strategy(
+    access_token_db: AccessTokenDatabase[AccessToken] = Depends(get_access_token_db),
+) -> DatabaseStrategy[UserCreate, UserDB, AccessToken]:
+    return DatabaseStrategy(access_token_db, lifetime_seconds=3600)
 
 auth_backend = AuthenticationBackend(
-    name="jwt",
+    name="db",
     transport=bearer_transport,
-    get_strategy=get_jwt_strategy,
+    get_strategy=get_database_strategy,
 )
 fastapi_users = FastAPIUsers(
     get_user_manager,
