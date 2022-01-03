@@ -7,7 +7,7 @@ from app.users import auth_backend, current_active_user, fastapi_users
 app = FastAPI()
 
 app.include_router(
-    fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
+    fastapi_users.get_auth_router(auth_backend), prefix="/auth/db", tags=["auth"]
 )
 app.include_router(fastapi_users.get_register_router(), prefix="/auth", tags=["auth"])
 app.include_router(

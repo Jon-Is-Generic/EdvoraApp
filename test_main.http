@@ -1,3 +1,36 @@
+
+
+POST http://localhost:8000/auth/register
+Content-Type: application/json
+
+{
+  "email": "example@example.com",
+  "password" : "example"
+}
+
+###
+
+# curl
+#-H "Content-Type: multipart/form-data"
+#-X POST
+#-F "username=example@example.com"
+#-F "password=example"
+#http://localhost:8000/auth/db/login
+POST http://localhost:8000/auth/db/login
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="username"
+
+example@example.com
+--WebAppBoundary
+Content-Disposition: form-data; name="password"
+
+example
+--WebAppBoundary--
+
+###
+
 # Test your FastAPI endpoints
 
 GET http://127.0.0.1:8000/
@@ -9,3 +42,5 @@ GET http://127.0.0.1:8000/authenticated-route
 Accept: application/json
 
 ###
+
+
