@@ -1,3 +1,5 @@
+import asyncio
+
 import databases
 import sqlalchemy
 from fastapi_users.db import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
@@ -6,6 +8,7 @@ from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyBaseAccessTokenTable,
 )
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from sqlalchemy.orm import Session
 
 from app.models import AccessToken, UserDB
 
@@ -23,7 +26,11 @@ class AccessTokenTable(SQLAlchemyBaseAccessTokenTable, Base):
 engine = sqlalchemy.create_engine(
     DATABASE_URL, connect_args={"check_same_thread": False}
 )
+
+session = Session(engine)
+
 Base.metadata.create_all(engine)
+
 
 users = UserTable.__table__
 access_tokens = AccessTokenTable.__table__

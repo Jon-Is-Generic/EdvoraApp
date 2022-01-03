@@ -39,6 +39,7 @@ Accept: application/json
 ###
 
 GET http://127.0.0.1:8000/authenticated-route
+Authorization: Bearer 5DFZeTa8Qrj4VGpvmjFQa5ER_-2NE5dXp2fCia6aXqM
 Accept: application/json
 
 ###
