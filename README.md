@@ -13,7 +13,7 @@ For the basics of the API, use http://localhost:5000/docs - assuming you're runn
 
 ## Socket.IO
 
-To use the Socket.IO stuff, use the bearer tokens as authentication (see examples for details), and connect. The two types of events it processes are `message`, and `logout_all` - the former sends a message (your data) to all other connections (your own messages won't be emitted back to you), and the latter disconnects not only the connection that asks for it, but also all connections for the same user - corresponding with the "terminating other active sessions of the same user from one session" requirement.
+To use the Socket.IO stuff, use the bearer tokens as authentication (see examples for details), and connect. The two types of events it processes are `message`, and `logout_all` - the former sends a message (your data) to all other connections (your own messages won't be emitted back to you), and the latter disconnects not only the connection that asks for it, but also all connections for the same user - corresponding with the "terminating other active sessions of the same user from one session" requirement. Your client should also be able to process it's own `message` event - the event for receiving a message from the server.
 
 ## Expandability
 
