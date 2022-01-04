@@ -1,6 +1,6 @@
 
 
-POST http://localhost:8000/auth/register
+POST http://localhost:5000/auth/register
 Content-Type: application/json
 
 {
@@ -15,8 +15,8 @@ Content-Type: application/json
 #-X POST
 #-F "username=example@example.com"
 #-F "password=example"
-#http://localhost:8000/auth/db/login
-POST http://localhost:8000/auth/db/login
+#http://localhost:5000/auth/db/login
+POST http://localhost:5000/auth/db/login
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary
@@ -33,12 +33,12 @@ example
 
 # Test your FastAPI endpoints
 
-GET http://127.0.0.1:8000/
+GET http://127.0.0.1:5000/
 Accept: application/json
 
 ###
 
-GET http://127.0.0.1:8000/authenticated-route
+GET http://127.0.0.1:5000/authenticated-route
 Authorization: Bearer 5DFZeTa8Qrj4VGpvmjFQa5ER_-2NE5dXp2fCia6aXqM
 Accept: application/json
 

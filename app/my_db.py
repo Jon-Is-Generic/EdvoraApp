@@ -10,7 +10,7 @@ from fastapi_users_db_sqlalchemy.access_token import (
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import Session
 
-from app.models import AccessToken, UserDB
+from app.my_models import AccessToken, UserDB
 
 DATABASE_URL = "sqlite:///./test.db"
 database = databases.Database(DATABASE_URL)

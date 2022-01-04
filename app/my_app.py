@@ -4,14 +4,15 @@ from fastapi import Depends, FastAPI
 from fastapi_users.authentication.strategy import BaseAccessToken
 from fastapi_users_db_sqlalchemy.access_token import SQLAlchemyAccessTokenDatabase
 
-from app.db import database, get_access_token_db, session, AccessTokenTable, UserTable
-from app.models import UserDB, User
-from app.users import auth_backend, current_active_user, fastapi_users
+from app.my_db import database, get_access_token_db, session, AccessTokenTable, UserTable
+from app.my_models import UserDB, User
+from app.my_users import auth_backend, current_active_user, fastapi_users
 import socketio
 
 app = FastAPI()
 sio = socketio.AsyncServer(cors_allowed_origins='*', async_mode='asgi') # We don't care how they send it
 sio_app = socketio.ASGIApp(sio, app)
+
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/auth/db", tags=["auth"]
@@ -45,11 +46,9 @@ async def shutdown():
     await database.disconnect()
     session.close()
 
-def get_db (access_token_db : Depends(get_access_token_db)):
-    pass
 
 @sio.event
-def connect(sid, environ, auth):
+async def connect(sid, environ, auth):
     try:
         token = auth['token']
     except TypeError:
@@ -62,17 +61,33 @@ def connect(sid, environ, auth):
         raise ConnectionRefusedError('authentication failed')
     user_id = z.user_id
     print("Found entry", user_id)
-    # TODO - store user_id somewhere.
     username = session.query(UserTable).filter_by(id=user_id).first()
     if username is None:
         raise IndexError('invalid user')
     username = username.email
-    print("Thanks for logging in", username)
+    await sio.save_session(sid, {'username' : username, 'user_id' : user_id})
+    await sio.enter_room(sid, 'chat')
+    print("Logged in:", username)
 
 @sio.event
 async def message(sid, data):
-    print("message received", data)
+    session = await sio.get_session(sid)
+    msg = f"{session['username']}: {data}"
+    print(msg)
+    # await sio.emit('message', data=msg, skip_sid=sid, room='chat')
+    await sio.emit('message', data=msg, room='chat')
+
+
 
 @sio.event
-def disconnect(sid):
+async def disconnect(sid):
+    session = await sio.get_session(sid)
+    user_id = session['user_id']
     print('disconnect ', sid)
+
+
+async def log_out_with_id(user_id : str):
+    for participant in sio.manager.get_participants('/', 'chat'): # Understandably, this could be improved by keeping a dictionary tracking the sessions for each user. This was faster to write.
+        session = await sio.get_session(participant)
+        if session['user_id'] == user_id:
+            await sio.disconnect(participant)

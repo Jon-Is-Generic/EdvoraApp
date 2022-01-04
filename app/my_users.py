@@ -10,8 +10,8 @@ from fastapi_users.authentication import (
 from fastapi_users.authentication.strategy import AccessTokenDatabase, DatabaseStrategy
 from fastapi_users.db import SQLAlchemyUserDatabase
 
-from app.db import get_user_db, get_access_token_db
-from app.models import User, UserCreate, UserDB, UserUpdate, AccessToken
+from app.my_db import get_user_db, get_access_token_db
+from app.my_models import User, UserCreate, UserDB, UserUpdate, AccessToken
 
 SECRET = "SECRET"
 
@@ -38,8 +38,7 @@ class UserManager(BaseUserManager[UserCreate, UserDB]):
 async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db)):
     yield UserManager(user_db)
 
-
-bearer_transport = BearerTransport(tokenUrl="auth/db/login") # TODO - swap to db properly
+bearer_transport = BearerTransport(tokenUrl="auth/db/login") # Remember to make sure the function gets updated
 
 
 
