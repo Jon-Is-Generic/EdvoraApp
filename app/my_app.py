@@ -92,11 +92,11 @@ async def disconnect(sid):
 async def log_out_with_id(user_id : str):
     for p in sio.manager.get_participants('/', 'chat'): # Understandably, this could be improved by keeping a dictionary tracking the sessions for each user. This was faster to write... if you really want that code, hire me and I'll do it.
         participant = p[0]
-        print("PARTICIPANT", participant)
+        # print("PARTICIPANT", participant)
         try:
             session = await sio.get_session(participant)
-            print("SESSION", session)
-            print("USER", session['user_id'], session['username'])
+            # print("SESSION", session)
+            # print("USER", session['user_id'], session['username'])
             if session['user_id'] == user_id:
                 await sio.emit('message', data="Logging out all sessions", to=participant)
                 await sio.disconnect(participant)
