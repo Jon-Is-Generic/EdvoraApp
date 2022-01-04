@@ -68,7 +68,7 @@ async def message(sid, data):
     msg = f"{session['username']}: {data}"
     print(msg)
     await sio.emit('message', data=msg, skip_sid=sid, room='chat')
-    # await sio.emit('message', data=msg, room='chat')
+    # await sio.emit('message', data=msg, room='chat') # Swap the comments to make the sender receive a copy.
 
 @sio.event
 async def logout_all(sid, data):
