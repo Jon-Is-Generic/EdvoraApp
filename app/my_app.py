@@ -66,7 +66,7 @@ async def connect(sid, environ, auth):
         raise IndexError('invalid user')
     username = username.email
     await sio.save_session(sid, {'username' : username, 'user_id' : user_id})
-    await sio.enter_room(sid, 'chat')
+    sio.enter_room(sid, 'chat')
     print("Logged in:", username)
 
 @sio.event
@@ -74,20 +74,31 @@ async def message(sid, data):
     session = await sio.get_session(sid)
     msg = f"{session['username']}: {data}"
     print(msg)
-    # await sio.emit('message', data=msg, skip_sid=sid, room='chat')
-    await sio.emit('message', data=msg, room='chat')
+    await sio.emit('message', data=msg, skip_sid=sid, room='chat')
+    # await sio.emit('message', data=msg, room='chat')
 
-
+@sio.event
+async def logout_all(sid, data):
+    session = await sio.get_session(sid)
+    user_id = session['user_id']
+    await log_out_with_id(user_id)
 
 @sio.event
 async def disconnect(sid):
-    session = await sio.get_session(sid)
-    user_id = session['user_id']
+
     print('disconnect ', sid)
 
 
 async def log_out_with_id(user_id : str):
-    for participant in sio.manager.get_participants('/', 'chat'): # Understandably, this could be improved by keeping a dictionary tracking the sessions for each user. This was faster to write.
-        session = await sio.get_session(participant)
-        if session['user_id'] == user_id:
-            await sio.disconnect(participant)
+    for p in sio.manager.get_participants('/', 'chat'): # Understandably, this could be improved by keeping a dictionary tracking the sessions for each user. This was faster to write... if you really want that code, hire me and I'll do it.
+        participant = p[0]
+        print("PARTICIPANT", participant)
+        try:
+            session = await sio.get_session(participant)
+            print("SESSION", session)
+            print("USER", session['user_id'], session['username'])
+            if session['user_id'] == user_id:
+                await sio.emit('message', data="Logging out all sessions", to=participant)
+                await sio.disconnect(participant)
+        except KeyError:
+            print("KEY ERROR")
