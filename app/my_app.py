@@ -1,18 +1,15 @@
-from typing import Union, Any, AsyncGenerator
-
 from fastapi import Depends, FastAPI
-from fastapi_users.authentication.strategy import BaseAccessToken
-from fastapi_users_db_sqlalchemy.access_token import SQLAlchemyAccessTokenDatabase
 
-from app.my_db import database, get_access_token_db, session, AccessTokenTable, UserTable
-from app.my_models import UserDB, User
-from app.my_users import auth_backend, current_active_user, fastapi_users
 import socketio
+from fastapi import Depends, FastAPI
+
+from app.my_db import database, session, AccessTokenTable, UserTable
+from app.my_models import UserDB
+from app.my_users import auth_backend, current_active_user, fastapi_users
 
 app = FastAPI()
-sio = socketio.AsyncServer(cors_allowed_origins='*', async_mode='asgi') # We don't care how they send it
+sio = socketio.AsyncServer(cors_allowed_origins='*', async_mode='asgi')  # We don't care how they send it
 sio_app = socketio.ASGIApp(sio, app)
-
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/auth/db", tags=["auth"]
@@ -85,18 +82,14 @@ async def logout_all(sid, data):
 
 @sio.event
 async def disconnect(sid):
-
     print('disconnect ', sid)
 
 
 async def log_out_with_id(user_id : str):
     for p in sio.manager.get_participants('/', 'chat'): # Understandably, this could be improved by keeping a dictionary tracking the sessions for each user. This was faster to write... if you really want that code, hire me and I'll do it.
         participant = p[0]
-        # print("PARTICIPANT", participant)
         try:
             session = await sio.get_session(participant)
-            # print("SESSION", session)
-            # print("USER", session['user_id'], session['username'])
             if session['user_id'] == user_id:
                 await sio.emit('message', data="Logging out all sessions", to=participant)
                 await sio.disconnect(participant)
