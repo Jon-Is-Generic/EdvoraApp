@@ -5,7 +5,6 @@ from fastapi_users import BaseUserManager, FastAPIUsers
 from fastapi_users.authentication import (
     AuthenticationBackend,
     BearerTransport,
-    JWTStrategy,
 )
 from fastapi_users.authentication.strategy import AccessTokenDatabase, DatabaseStrategy
 from fastapi_users.db import SQLAlchemyUserDatabase
@@ -25,12 +24,12 @@ class UserManager(BaseUserManager[UserCreate, UserDB]):
         print(f"User {user.id} has registered.")
 
     async def on_after_forgot_password(
-        self, user: UserDB, token: str, request: Optional[Request] = None
+            self, user: UserDB, token: str, request: Optional[Request] = None
     ):
         print(f"User {user.id} has forgot their password. Reset token: {token}")
 
     async def on_after_request_verify(
-        self, user: UserDB, token: str, request: Optional[Request] = None
+            self, user: UserDB, token: str, request: Optional[Request] = None
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
 
@@ -38,14 +37,15 @@ class UserManager(BaseUserManager[UserCreate, UserDB]):
 async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db)):
     yield UserManager(user_db)
 
-bearer_transport = BearerTransport(tokenUrl="auth/db/login") # Remember to make sure the function gets updated
 
+bearer_transport = BearerTransport(tokenUrl="auth/db/login")  # Remember to make sure the function gets updated
 
 
 def get_database_strategy(
-    access_token_db: AccessTokenDatabase[AccessToken] = Depends(get_access_token_db),
+        access_token_db: AccessTokenDatabase[AccessToken] = Depends(get_access_token_db),
 ) -> DatabaseStrategy[UserCreate, UserDB, AccessToken]:
     return DatabaseStrategy(access_token_db, lifetime_seconds=3600)
+
 
 auth_backend = AuthenticationBackend(
     name="db",
@@ -62,4 +62,3 @@ fastapi_users = FastAPIUsers(
 )
 
 current_active_user = fastapi_users.current_user(active=True)
-

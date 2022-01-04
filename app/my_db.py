@@ -1,5 +1,3 @@
-import asyncio
-
 import databases
 import sqlalchemy
 from fastapi_users.db import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
@@ -18,10 +16,12 @@ Base: DeclarativeMeta = declarative_base()
 
 
 class UserTable(Base, SQLAlchemyBaseUserTable):
-    pass
+	pass
+
 
 class AccessTokenTable(SQLAlchemyBaseAccessTokenTable, Base):
     pass
+
 
 engine = sqlalchemy.create_engine(
     DATABASE_URL, connect_args={"check_same_thread": False}
@@ -31,13 +31,13 @@ session = Session(engine)
 
 Base.metadata.create_all(engine)
 
-
 users = UserTable.__table__
 access_tokens = AccessTokenTable.__table__
 
 
 async def get_user_db():
     yield SQLAlchemyUserDatabase(UserDB, database, users)
+
 
 async def get_access_token_db():
     yield SQLAlchemyAccessTokenDatabase(AccessToken, database, access_tokens)

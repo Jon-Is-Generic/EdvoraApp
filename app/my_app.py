@@ -1,5 +1,3 @@
-from fastapi import Depends, FastAPI
-
 import socketio
 from fastapi import Depends, FastAPI
 

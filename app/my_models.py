@@ -3,7 +3,7 @@ from fastapi_users.authentication.strategy.db import BaseAccessToken
 
 
 class User(models.BaseUser):
-    pass
+	pass
 
 
 class UserCreate(models.BaseUserCreate):
@@ -16,6 +16,7 @@ class UserUpdate(models.BaseUserUpdate):
 
 class UserDB(User, models.BaseUserDB):
     pass
+
 
 class AccessToken(BaseAccessToken):
     pass
