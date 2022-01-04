@@ -50,12 +50,10 @@ async def connect(sid, environ, auth):
         token = None
     if token is None:
         raise ConnectionRefusedError('authentication failed')
-    print("connect ", sid, "auth: ", auth)
     z = session.query(AccessTokenTable).filter_by(token=token).first()
     if z is None:
         raise ConnectionRefusedError('authentication failed')
     user_id = z.user_id
-    print("Found entry", user_id)
     username = session.query(UserTable).filter_by(id=user_id).first()
     if username is None:
         raise IndexError('invalid user')
